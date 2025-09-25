@@ -32,7 +32,7 @@ cd lmme3dhf
 
 Create and activate a conda environment:
 ``` bash
-conda env create -f environment.yml
+conda env create -f env.yml
 conda activate lmme3dhf
 ```
 
