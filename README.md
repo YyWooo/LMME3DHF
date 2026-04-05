@@ -9,11 +9,11 @@
 \
 ![Model Overview](./misc/model_view.png)
 
-## 📌 Abstract
+# 📌 Abstract
 The rapid advancement in generative artificial intelligence have enabled the creation of 3D human faces (HFs) for applications including media production, virtual reality, security, healthcare, and game development, etc. However, assessing the quality and realism of these AI-generated 3D human faces remains a significant challenge due to the subjective nature of human perception and innate perceptual sensitivity to facial features. To this end, we conduct a comprehensive study on the quality assessment of AI-generated 3D human faces. We first introduce **`Gen3DHF`**, a large-scale benchmark comprising 2,000 videos of AI-Generated 3D Human Faces along with 4,000 Mean Opinion Scores (MOS) collected across two dimensions, i.e., quality and authenticity, 2,000 distortion-aware saliency maps and distortion descriptions. Based on Gen3DHF, we propose **`LMME3DHF`**, a Large Multimodal Model (LMM)-based metric for Evaluating 3DHF capable of quality and authenticity score prediction, distortion-aware visual question answering, and distortion-aware saliency prediction. Experimental results show that LMME3DHF achieves state-of-the-art performance, surpassing existing methods in both accurately predicting quality scores for AI-generated 3D human faces and effectively identifying distortionaware salient regions and distortion types, while maintaining strong alignment with human perceptual judgments. Both the Gen3DHF database and the LMME3DHF will be released upon the publication
 
 
-## 📂 Gen3DHF Dataset
+# 📂 Gen3DHF Dataset
 The Gen3DHF dataset is available on 🤗[HuggingFace](https://huggingface.co/datasets/yywooo/Gen3DHF).
 \
 Or using script:
@@ -23,7 +23,24 @@ python download_dataset.py
 # --dataset: Choose which dataset to download (Default: "image video_RGB saliency_map")
 ```
 
-## ⚙️ Installion
+# 🧹 Saliency map Data Preprocessing
+## Create saliceny distortion map
+Convert red dot label image -> saliency map (dense and continuous)
+``` bash
+python src/create_heatmap.py
+# --input_dir: Path to the input directory containing red dot images
+# --output_dir: Path to the output directory for saliency maps (Default: "saliency_map")
+```
+
+## Create fixation distortion map
+Convert saliencty map -> fixtaion map (binary and sparse)
+``` bash
+python src/create_fixiation.py
+# --saliency_dir: Path to the directory containing saliency maps
+# --output_dir: Path to the output directory for fixation maps
+```
+
+# ⚙️ Installion
 Clone this repository:
 ``` bash
 git clone https://github.com/YyWooo/LMME3DHF.git
@@ -32,39 +49,41 @@ cd lmme3dhf
 
 Create and activate a conda environment:
 ``` bash
-conda env create -f env.yml
+conda env create -f environment.yml
 conda activate lmme3dhf
 ```
 
-
-## 🚀 Training
-### Stage 1: Texture Output:
+# 🚀 Training
+## Stage 1: Texture Output
 Results will be saved in "output" directory.
 ``` bash
-./train_LLM.sh
+./main/train_LLM.sh
 # Edit the first line to set CUDA_VISIBLE_DEVICES
 
-./merge_lora.sh
+./main/merge_lora.sh
 # --adapter: Path to Stage 1 results directory
 ```
 
-### For stage 2 (Numerical Output):
+## Stage 2: Numerical Output
 Results will be saved in "output" directory.
 ``` bash
-./train_MLP.sh
-
+./main/train_MLP.sh
 # Edit the first line to set CUDA_VISIBLE_DEVICES
 # --model: Path to Stage 1 results directory
 
-./merge_lora.sh
+./main/merge_lora.sh
 # --adapter: Path to Stage 2 results directory
 
 CUDA_VISIBLE_DEVICES= python merge_mlp.py
 # line 6: Change to Stage 2 results directory after merging LoRA
 ```
 
+## Stage 3: Distortion-aware Saliency map Output
+```
+Please refer to instruction inside `main_saliency` directory
+```
 
-## 📊 Evaluation
+# 📊 Evaluation
 ``` bash
 cd evaluate
 
@@ -77,11 +96,15 @@ CUDA_VISIBLE_DEVICES= python inference_text.py
 # --val_dataset: Path to evaluation dataset (e.g., "../datasets/numerical/eval_quality.json")
 ```
 
+## Visualize saliency map prediction results
+``` bash
+python src/overlay_saliency.py
+```
 
-## 📬 Contact
+# 📬 Contact
 For any questions, please reach out to: `wooyiyang@sjtu.edu.cn`
 
-## 📖 Citations
+# 📖 Citations
 If you find this work useful, please cite:
 ```bibtex
 @article{yang2025lmme3dhf,
@@ -90,3 +113,4 @@ If you find this work useful, please cite:
   journal={arXiv preprint arXiv:2504.20466},
   year={2025}
 }
+```
